@@ -1,3 +1,5 @@
+
+
 var csrf = "";
 var oauth = "";
 var port = 4370;
@@ -65,17 +67,23 @@ function updateTrackId(trackId) {
     }
 }
 
+// function refreshCurrentSong() {
+//     $.post( "http://partify.club/api/currentSong", {accessCode: accessCode, songId : currentTrack}, function( data ) {
+//         console.log("RESPONSE" + data);
+//     });
+// }
+
 function postTrackToPlaylist() {
     var xmlhttp = new XMLHttpRequest();
-    url = "http://partify.herokuapp.com/api/currentSong";
+    url = "https://partify.herokuapp.com/api/currentSong";
     // var params = "accessCode=" + accessCode + "&songId=" + '"' + currentTrack + '"';
     var params = "accessCode=" + accessCode + "&songId=" + currentTrack;
-    xmlhttp.open("POST", url, true);
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             console.log("new song posted to partify");
         }
     }
+    xmlhttp.open("POST", url, true);
     xmlhttp.send(params);
 }
 
@@ -96,7 +104,8 @@ var getStatus = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             var jsonResponse = JSON.parse(xmlhttp.responseText);
             var trackUri = jsonResponse["track"]["track_resource"]["uri"];
-            var localCurrentTrack = trackUri.replace("spotify:track:", "");
+            //var localCurrentTrack = trackUri.replace("spotify:track:", "");
+            var localCurrentTrack = trackUri;
             updateTrackId(localCurrentTrack);
             console.log(localCurrentTrack);
             var length = jsonResponse["track"]["length"]

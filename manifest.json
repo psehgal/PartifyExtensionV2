@@ -12,6 +12,7 @@
      "*://*.spotilocal.com:*/*",
      "*://*.spotilocal.com/*",
      "*://open.spotify.com/*",
+     "*://partify.club/*",
      "webRequest",
      "webRequestBlocking"
   ],
