@@ -57,7 +57,7 @@ function logTokens() {
 
 function updateStatus() {
     getStatus();
-    setTimeout(function() { updateStatus() }, 2000);
+    setTimeout(function() { updateStatus() }, 1000);
 }
 
 function initializeTokens() {
@@ -123,7 +123,7 @@ var refreshPlaylist = function() {
         chrome.tabs.create({"url":"spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2","active":true}, function(tab){
             console.log(tab.id);
         });
-    }, 250);
+    }, 500);
     setTimeout(function() { removeTab("spotify:user:pswizzy:starred") }, 1000);
     setTimeout(function() { removeTab("spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2") }, 1000);
 }
@@ -131,7 +131,7 @@ var refreshPlaylist = function() {
 var getStatus = function() {
     var xmlhttp = new XMLHttpRequest();
     url = "https://" + makeid(10) + ".spotilocal.com:" + port.toString() + "/remote/status.json?csrf=" + csrf + "&oauth=" + oauth;
-    console.log(url);
+    //console.log(url);
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             var jsonResponse = JSON.parse(xmlhttp.responseText);
@@ -139,12 +139,13 @@ var getStatus = function() {
             //var localCurrentTrack = trackUri.replace("spotify:track:", "");
             var localCurrentTrack = trackUri;
             updateTrackId(localCurrentTrack);
-            console.log(localCurrentTrack);
+            //console.log(localCurrentTrack);
             var length = jsonResponse["track"]["length"]
             var position = jsonResponse["playing_position"]
             var percent = (position / length) * 100;
             currentPosition = percent;
-            if (percent >= refreshThreshold && refreshed == false) {
+            if (percent >= 75 && refreshed == false) {
+                console.log("about to call refreshPlaylist()");
                 refreshPlaylist();
             }
         }
