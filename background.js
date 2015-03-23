@@ -6,6 +6,8 @@ var port = 4370;
 var currentTrack = "";
 var currentPosition;
 var accessCode;
+var refreshed = false;
+var refreshThreshold = 0.90;
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 function(details) {
@@ -65,6 +67,7 @@ function initializeTokens() {
 
 function updateTrackId(trackId) {
     if (currentTrack != trackId) {
+        refreshed = false;
         currentTrack = trackId;
         console.log("current track updated: " + currentTrack);
         postTrackToPlaylist();
@@ -108,22 +111,20 @@ function removeTab(url) {
     })
 }
 
+//spotify:user:pswizzy:starred
+//spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2
+
 var refreshPlaylist = function() {
-    //create a tab with starred playlist
-    chrome.tabs.create({"url":"spotify:user:pswizzy:starred","active":true}, function(tab){
+    refreshed = true;
+    chrome.tabs.create({"url":"spotify:user:pswizzy:starred","active":false}, function(tab){
         console.log(tab.id);
-        //tabId = tab.id;
+    });
+    setTimeout(function() {
         chrome.tabs.create({"url":"spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2","active":true}, function(tab){
             console.log(tab.id);
         });
-    });
-    //close it
+    }, 250);
     setTimeout(function() { removeTab("spotify:user:pswizzy:starred") }, 1000);
-    //create a tab with partify playlist
-    // chrome.tabs.create({"url":"spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2","active":true}, function(tab){
-    //     console.log(tab.id);
-    // });
-    //close it
     setTimeout(function() { removeTab("spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2") }, 1000);
 }
 
@@ -143,6 +144,9 @@ var getStatus = function() {
             var position = jsonResponse["playing_position"]
             var percent = (position / length) * 100;
             currentPosition = percent;
+            if (percent >= refreshThreshold && refreshed == false) {
+                refreshPlaylist();
+            }
         }
     }
     xmlhttp.open("GET", url, true);
