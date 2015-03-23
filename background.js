@@ -39,6 +39,10 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             logTokens();
             updateStatus();
             break;
+        case "refresh-playlist":
+            console.log("case refresh-playlist");
+            refreshPlaylist();
+            break;
         break;
     }
     return true;
@@ -94,6 +98,33 @@ function makeid(length) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
 
     return text;
+}
+
+function removeTab(url) {
+    chrome.tabs.query({"url":url}, function(tabs) {
+        for (var i = 0; i < tabs.length; i++) {
+            chrome.tabs.remove(tabs[i].id);
+        }
+    })
+}
+
+var refreshPlaylist = function() {
+    //create a tab with starred playlist
+    chrome.tabs.create({"url":"spotify:user:pswizzy:starred","active":true}, function(tab){
+        console.log(tab.id);
+        //tabId = tab.id;
+        chrome.tabs.create({"url":"spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2","active":true}, function(tab){
+            console.log(tab.id);
+        });
+    });
+    //close it
+    setTimeout(function() { removeTab("spotify:user:pswizzy:starred") }, 1000);
+    //create a tab with partify playlist
+    // chrome.tabs.create({"url":"spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2","active":true}, function(tab){
+    //     console.log(tab.id);
+    // });
+    //close it
+    setTimeout(function() { removeTab("spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2") }, 1000);
 }
 
 var getStatus = function() {

@@ -15,11 +15,15 @@ window.onload = function() {
         })
     }
     document.getElementById("accessCodeSubmit").onclick = function() {
-        console.log("here");
         var accessCode = document.getElementById("accessCodeInput").value;
         chrome.extension.sendMessage({
             type: "access-submit",
             accessCode: accessCode
+        })
+    }
+    document.getElementById("refresh").onclick = function() {
+        chrome.extension.sendMessage({
+            type: "refresh-playlist"
         })
     }
 }
