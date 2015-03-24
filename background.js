@@ -87,10 +87,12 @@ function postTrackToPlaylist() {
     var params = "accessCode=" + accessCode + "&songId=" + currentTrack;
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            console.log(xmlhttp.responseText);
             console.log("new song posted to partify");
         }
     }
     xmlhttp.open("POST", url, true);
+    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
     xmlhttp.send(params);
 }
 
@@ -120,12 +122,12 @@ var refreshPlaylist = function() {
         console.log(tab.id);
     });
     setTimeout(function() {
-        chrome.tabs.create({"url":"spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2","active":true}, function(tab){
+        chrome.tabs.create({"url":"spotify:user:pswizzy:playlist:4fFrOByHKGK2i2WckG74Vc","active":false}, function(tab){
             console.log(tab.id);
         });
     }, 500);
     setTimeout(function() { removeTab("spotify:user:pswizzy:starred") }, 1000);
-    setTimeout(function() { removeTab("spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2") }, 1000);
+    setTimeout(function() { removeTab("spotify:user:pswizzy:playlist:4fFrOByHKGK2i2WckG74Vc") }, 1000);
 }
 
 var getStatus = function() {
