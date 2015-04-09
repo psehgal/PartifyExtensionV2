@@ -8,7 +8,6 @@
   	 "tabs",
   	 "notifications",
   	 "*://partify.herokuapp.com/*",
-  	 "*://play.spotify.com/*",
      "*://*.spotilocal.com:*/*",
      "*://*.spotilocal.com/*",
      "*://open.spotify.com/*",
@@ -23,7 +22,7 @@
       "19": "icons/partify_icon.png",
       "38": "icons/partify_icon.png"
     },
-    "default_title": "That's the tool tip",
+    "default_title": "partify!",
     "default_popup": "popup.html"
   },
   
