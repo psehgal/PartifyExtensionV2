@@ -1,5 +1,5 @@
-var keys = document.getElementsByClassName("setting-key");
-var values = document.getElementsByClassName("setting-val");
+var keys = document.getElementsByClassName("big-boy-title");
+var values = document.getElementsByClassName("big-boy-value");
 var id = values[0].innerText;
 chrome.extension.sendMessage({
 	type: "id",
