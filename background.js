@@ -126,7 +126,6 @@ var getAccessCode = function(id) {
             playlistId = localPlaylistId;
             accessCode = localAccessCode;
             openTabsInitially();
-            console.log("Here...");
         }
     }
     xmlhttp.open("GET", url, true);
