@@ -10,6 +10,7 @@ var playlistId = "";
 var spotifyId = "";
 var refreshed = false;
 var refreshThreshold = 0.90;
+var openedOnce = false;
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 function(details) {
@@ -35,44 +36,44 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             console.log("case login");
             login();
             break;
-        case "get-csrf":
-            console.log("case get-csrf");
-            getCsrf();
-            break;
-        case "get-oauth":
-            console.log("case get-oauth");
-            getOauth();
-            break;
-        case "get-status":
-            console.log("case get-status");
-            getStatus();
-            break;
-        case "access-submit":
-            console.log("case access-submit");
-            var localAccessCode = request.accessCode;
-            accessCode = localAccessCode;
-            //TODO: send a response to update the popup UI
-            initializeTokens();
-            logTokens();
-            updateStatus();
-            break;
-        case "refresh-playlist":
-            console.log("case refresh-playlist");
-            refreshPlaylist();
-            break;
+        // case "get-csrf":
+        //     console.log("case get-csrf");
+        //     getCsrf();
+        //     break;
+        // case "get-oauth":
+        //     console.log("case get-oauth");
+        //     getOauth();
+        //     break;
+        // case "get-status":
+        //     console.log("case get-status");
+        //     getStatus();
+        //     break;
+        // case "access-submit":
+        //     console.log("case access-submit");
+        //     var localAccessCode = request.accessCode;
+        //     accessCode = localAccessCode;
+        //     //TODO: send a response to update the popup UI
+        //     initializeTokens();
+        //     logTokens();
+        //     updateStatus();
+        //     break;
+        // case "refresh-playlist":
+        //     console.log("case refresh-playlist");
+        //     refreshPlaylist();
+        //     break;
         break;
     }
     return true;
 });
 
-function logTokens() {
-    console.log("csrf: " + csrf);
-    console.log("oauth: " + oauth);
-}
-
 function updateStatus() {
     getStatus();
     setTimeout(function() { updateStatus() }, 1000);
+}
+
+function logTokens() {
+    console.log("csrf: " + csrf);
+    console.log("oauth: " + oauth);
 }
 
 function initializeTokens() {
@@ -88,12 +89,6 @@ function updateTrackId(trackId) {
         postTrackToPlaylist();
     }
 }
-
-// function refreshCurrentSong() {
-//     $.post( "http://partify.club/api/currentSong", {accessCode: accessCode, songId : currentTrack}, function( data ) {
-//         console.log("RESPONSE" + data);
-//     });
-// }
 
 function postTrackToPlaylist() {
     var xmlhttp = new XMLHttpRequest();
@@ -128,15 +123,25 @@ function removeTab(url) {
     })
 }
 
+function openTabsInitially() {
+    var partifyPlaylistUrl = "spotify:user:" + spotifyId + ":playlist:" + playlistId;
+    chrome.tabs.create({url:partifyPlaylistUrl,"active":false});
+    setTimeout(function() { removeTab(partifyPlaylistUrl) }, 1000);
+    chrome.tabs.create({url:"http://partify.club/party/" + accessCode,"active":false});
+}
+
 var getAccessCode = function(id) {
     var url = "http://www.partify.club/api/auth?spotifyId=" + id;
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
-        var jsonResponse = JSON.parse(xmlhttp.responseText);
-        var localAccessCode = jsonResponse["accessCode"];
-        var localPlaylistId = jsonResponse["playlistId"];
-        playlistId = localPlaylistId;
-        accessCode = localAccessCode;
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var jsonResponse = JSON.parse(xmlhttp.responseText);
+            var localAccessCode = jsonResponse["accessCode"];
+            var localPlaylistId = jsonResponse["playlistId"];
+            playlistId = localPlaylistId;
+            accessCode = localAccessCode;
+            openTabsInitially();
+        }
     }
     xmlhttp.open("GET", url, true);
     xmlhttp.send();
@@ -144,15 +149,8 @@ var getAccessCode = function(id) {
 
 var login = function() {
     var url = "http://www.partify.club/login"
-    chrome.tabs.create({url: url, active: true}, function callback(tab) {
-        var id = tab.id;
-        //chrome.tabs.executeScript(id, { file: "get_id.js" });
-        console.log(tab.url);
-    });
+    chrome.tabs.create({url: url, active: true}, function callback(tab) {});
 }
-
-//spotify:user:pswizzy:starred
-//spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2
 
 var refreshPlaylist = function() {
     refreshed = true;

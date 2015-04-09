@@ -34,7 +34,7 @@
 
   "content_scripts": [
     {
-      "matches": ["*://partify.herokuapp.com/callback?code=*", "http://partify.club/login"],
+      "matches": ["*://partify.herokuapp.com/callback?code=*"],
       "js": ["get_id.js"]
     }
   ]
