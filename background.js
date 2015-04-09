@@ -36,31 +36,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             console.log("case login");
             login();
             break;
-        // case "get-csrf":
-        //     console.log("case get-csrf");
-        //     getCsrf();
-        //     break;
-        // case "get-oauth":
-        //     console.log("case get-oauth");
-        //     getOauth();
-        //     break;
-        // case "get-status":
-        //     console.log("case get-status");
-        //     getStatus();
-        //     break;
-        // case "access-submit":
-        //     console.log("case access-submit");
-        //     var localAccessCode = request.accessCode;
-        //     accessCode = localAccessCode;
-        //     //TODO: send a response to update the popup UI
-        //     initializeTokens();
-        //     logTokens();
-        //     updateStatus();
-        //     break;
-        // case "refresh-playlist":
-        //     console.log("case refresh-playlist");
-        //     refreshPlaylist();
-        //     break;
         break;
     }
     return true;
