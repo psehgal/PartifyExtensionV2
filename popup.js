@@ -4,7 +4,7 @@ window.onload = function() {
         chrome.extension.sendMessage({
             type: "login"
         });
-    }
+    };
     chrome.extension.sendMessage({
         type: "get-status"
     },
@@ -14,5 +14,5 @@ window.onload = function() {
 }
 
 function renderStatus(message) {
-	document.getElementById("status").textContent = message;
+	document.getElementById("status").innerHTML = message;
 }

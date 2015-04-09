@@ -3,18 +3,94 @@
 
 <head>
 	<script type="text/javascript" src="popup.js"></script>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 </head>
 
 <body>
-	<div class="jumbotron">
-		<h1>Partify!</h1>
-		<p id="status"></p>
-		<div class="span7 text-center">
-			<p><a id="login" class="btn btn-primary btn-lg" href="#" role="button">Authenticate</a></p>
-		</div>
+	<div class="logo-wrap">
+		<div class="logo"></div>
 	</div>
+		<div class="title">access code</div>
+		<div id="status" class="access-code">...</div>
+		<div class="title">setup, preferences, party rules</div>
+		<div id="login" class="access-code">manage</div>
 </body>
 
+<style type="text/css">
+
+body {
+	width: 250px;
+	height: 300px;
+	overflow: hidden;
+	padding: 0;
+	margin: 0;
+	background: #fff;
+	color: #1b1b1b;
+	font-family: sans-serif;
+	font-weight: 300;
+	-moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-input-placeholder { color: #fff; }
+:-moz-placeholder { color: #fff; }
+::-moz-placeholder { color: #fff; }
+:-ms-input-placeholder { color: #fff; }
+
+h1, h2, h3, h4, h5, h6, p {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+.logo-wrap {
+	width: 90%;
+	height: 30px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	margin-right: 5%;
+	margin-left: 5%;
+	margin-bottom: 25px;
+	border-bottom: 2px solid #cf3087;
+}
+
+.logo {
+	background: url('logo.png') no-repeat;
+	background-size: contain;
+	width: 100px;
+	height: 50px;
+	float: right;
+	margin: 0 auto 0;
+}
+
+.access-code {
+	width: 90%;
+	height: 70px;
+	line-height: 70px;
+	padding-left: 5%;
+	padding-right: 5%;
+	margin-bottom: 20px;
+	background: #cf3087;
+	color: #fff;
+	font-size: 24px;
+	font-weight: 100;
+	text-align: right;
+	float: left;
+	pointer: cursor;
+	letter-spacing: -1.5px;
+}
+
+.title {
+	float: left;
+	text-align: right;
+	width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
+	margin-bottom: 5px;
+	font-weight: 700;
+	letter-spacing: -1px;
+	color: #cf3087;
+}
+
+</style>
 
 </html>

@@ -38,7 +38,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             break;
         case "get-status":
             console.log("case get-status");
-            var res = "Authenticate to continue";
+            var res = '<span style="opacity:.5;">connect</span>';
             if (!(accessCode == "")) {
                 res = accessCode;
             }
