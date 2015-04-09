@@ -36,6 +36,16 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             console.log("case login");
             login();
             break;
+        case "get-status":
+            console.log("case get-status");
+            var res = "Authenticate to continue";
+            if (!(accessCode == "")) {
+                res = accessCode;
+            }
+            sendResponse({
+                message: res
+            });
+            break;
         break;
     }
     return true;
@@ -116,6 +126,7 @@ var getAccessCode = function(id) {
             playlistId = localPlaylistId;
             accessCode = localAccessCode;
             openTabsInitially();
+            console.log("Here...");
         }
     }
     xmlhttp.open("GET", url, true);
@@ -146,7 +157,6 @@ var refreshPlaylist = function() {
 var getStatus = function() {
     var xmlhttp = new XMLHttpRequest();
     url = "https://" + makeid(10) + ".spotilocal.com:" + port.toString() + "/remote/status.json?csrf=" + csrf + "&oauth=" + oauth;
-    //console.log(url);
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             var jsonResponse = JSON.parse(xmlhttp.responseText);
@@ -163,6 +173,10 @@ var getStatus = function() {
                 console.log("about to call refreshPlaylist()");
                 refreshPlaylist();
             }
+        }
+        else if ((xmlhttp.readyState == 4 && xmlhttp.status == 0) || (xmlhttp.readyState == 0 && xmlhttp.status == 0)) {
+            console.log("status update error");
+            xmlhttp.abort();
         }
     }
     xmlhttp.open("GET", url, true);
