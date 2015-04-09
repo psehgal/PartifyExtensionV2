@@ -5,7 +5,9 @@ var oauth = "";
 var port = 4370;
 var currentTrack = "";
 var currentPosition;
-var accessCode;
+var accessCode = "";
+var playlistId = "";
+var spotifyId = "";
 var refreshed = false;
 var refreshThreshold = 0.90;
 
@@ -20,6 +22,19 @@ function(details) {
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     switch(request.type) {
+        case "id":
+            console.log("case id");
+            var id = request.value;
+            spotifyId = id;
+            getAccessCode(id);
+            initializeTokens();
+            logTokens();
+            updateStatus();
+            break;
+        case "login":
+            console.log("case login");
+            login();
+            break;
         case "get-csrf":
             console.log("case get-csrf");
             getCsrf();
@@ -113,21 +128,46 @@ function removeTab(url) {
     })
 }
 
+var getAccessCode = function(id) {
+    var url = "http://www.partify.club/api/auth?spotifyId=" + id;
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+        var jsonResponse = JSON.parse(xmlhttp.responseText);
+        var localAccessCode = jsonResponse["accessCode"];
+        var localPlaylistId = jsonResponse["playlistId"];
+        playlistId = localPlaylistId;
+        accessCode = localAccessCode;
+    }
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+}
+
+var login = function() {
+    var url = "http://www.partify.club/login"
+    chrome.tabs.create({url: url, active: true}, function callback(tab) {
+        var id = tab.id;
+        //chrome.tabs.executeScript(id, { file: "get_id.js" });
+        console.log(tab.url);
+    });
+}
+
 //spotify:user:pswizzy:starred
 //spotify:user:pswizzy:playlist:5ZLL5PbxX1VCsTyMYJfgY2
 
 var refreshPlaylist = function() {
     refreshed = true;
-    chrome.tabs.create({"url":"spotify:user:pswizzy:starred","active":false}, function(tab){
+    var starredPlaylistUrl = "spotify:user:" + spotifyId + ":starred";
+    var partifyPlaylistUrl = "spotify:user:" + spotifyId + ":playlist:" + playlistId;
+    chrome.tabs.create({"url":starredPlaylistUrl, "active":false}, function(tab){
         console.log(tab.id);
     });
     setTimeout(function() {
-        chrome.tabs.create({"url":"spotify:user:pswizzy:playlist:4fFrOByHKGK2i2WckG74Vc","active":false}, function(tab){
+        chrome.tabs.create({"url":partifyPlaylistUrl,"active":false}, function(tab){
             console.log(tab.id);
         });
     }, 500);
-    setTimeout(function() { removeTab("spotify:user:pswizzy:starred") }, 1000);
-    setTimeout(function() { removeTab("spotify:user:pswizzy:playlist:4fFrOByHKGK2i2WckG74Vc") }, 1000);
+    setTimeout(function() { removeTab(starredPlaylistUrl) }, 1000);
+    setTimeout(function() { removeTab(partifyPlaylistUrl) }, 1000);
 }
 
 var getStatus = function() {

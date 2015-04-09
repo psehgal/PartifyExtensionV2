@@ -13,6 +13,7 @@
      "*://*.spotilocal.com/*",
      "*://open.spotify.com/*",
      "*://partify.club/*",
+     "http://www.partify.club/login",
      "webRequest",
      "webRequestBlocking"
   ],
@@ -29,6 +30,13 @@
   "background" : {
   	"scripts": ["background.js"],
   	"persistent": true
-  }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://partify.herokuapp.com/callback?code=*", "http://partify.club/login"],
+      "js": ["get_id.js"]
+    }
+  ]
 
 }
