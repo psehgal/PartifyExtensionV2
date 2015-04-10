@@ -41,7 +41,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         case "get-status":
             console.log("case get-status");
             var res = '<span style="opacity:.5;">connect</span>';
-            var onoff = (off == false) ? "off" : "on";
+            var onoff = (off == false) ? "Turn Off Partify Service" : "Turn On Partify Service";
             console.log("onoff: " + onoff);
             if (!(accessCode == "")) {
                 res = accessCode;
@@ -66,7 +66,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             } else {
                 off = false;
             }
-            var onoff = (off == false) ? "off" : "on";
+            var onoff = (off == false) ? "Turn Off Partify Service" : "Turn On Partify Service";
             sendResponse({
                 onoff: onoff
             })
