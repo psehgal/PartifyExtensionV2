@@ -11,6 +11,8 @@ var spotifyId = "";
 var refreshed = false;
 var refreshThreshold = 0.90;
 var openedOnce = false;
+var off = false;
+var on = !off;
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 function(details) {
@@ -39,11 +41,14 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         case "get-status":
             console.log("case get-status");
             var res = '<span style="opacity:.5;">connect</span>';
+            var onoff = (off == false) ? "off" : "on";
+            console.log("onoff: " + onoff);
             if (!(accessCode == "")) {
                 res = accessCode;
             }
             sendResponse({
-                message: res
+                message: res,
+                onoff: onoff
             });
             break;
         case "new-access-code":
@@ -54,13 +59,27 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             chrome.tabs.create({url:"http://www.partify.club/party/" + accessCode,"active":false});
             console.log("new access code: " + code);
             break;
+        case "toggle":
+            console.log("toggle");
+            if (off == false) {
+                off = true;
+            } else {
+                off = false;
+            }
+            var onoff = (off == false) ? "off" : "on";
+            sendResponse({
+                onoff: onoff
+            })
+            break;
         break;
     }
     return true;
 });
 
 function updateStatus() {
-    getStatus();
+    if (!off) {
+        getStatus();
+    }
     setTimeout(function() { updateStatus() }, 1000);
 }
 
