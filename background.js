@@ -46,6 +46,14 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
                 message: res
             });
             break;
+        case "new-access-code":
+            console.log("case new-access-code");
+            var code = request.value;
+            removeTab("http://www.partify.club/party/" + accessCode);
+            accessCode = code;
+            chrome.tabs.create({url:"http://www.partify.club/party/" + accessCode,"active":false});
+            console.log("new access code: " + code);
+            break;
         break;
     }
     return true;
@@ -159,18 +167,23 @@ var getStatus = function() {
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             var jsonResponse = JSON.parse(xmlhttp.responseText);
-            var trackUri = jsonResponse["track"]["track_resource"]["uri"];
-            //var localCurrentTrack = trackUri.replace("spotify:track:", "");
-            var localCurrentTrack = trackUri;
-            updateTrackId(localCurrentTrack);
-            //console.log(localCurrentTrack);
-            var length = jsonResponse["track"]["length"]
-            var position = jsonResponse["playing_position"]
-            var percent = (position / length) * 100;
-            currentPosition = percent;
-            if (percent >= 75 && refreshed == false) {
-                console.log("about to call refreshPlaylist()");
-                refreshPlaylist();
+            if (jsonResponse["error"]) {
+                console.log(xmlhttp.responseText);
+                initializeTokens();
+            } else if (jsonResponse["track"]["track_resource"]["uri"]) {
+                var trackUri = jsonResponse["track"]["track_resource"]["uri"];
+                //var localCurrentTrack = trackUri.replace("spotify:track:", "");
+                var localCurrentTrack = trackUri;
+                updateTrackId(localCurrentTrack);
+                //console.log(localCurrentTrack);
+                var length = jsonResponse["track"]["length"]
+                var position = jsonResponse["playing_position"]
+                var percent = (position / length) * 100;
+                currentPosition = percent;
+                if (percent >= 75 && refreshed == false) {
+                    console.log("about to call refreshPlaylist()");
+                    refreshPlaylist();
+                }
             }
         }
         else if ((xmlhttp.readyState == 4 && xmlhttp.status == 0) || (xmlhttp.readyState == 0 && xmlhttp.status == 0)) {
