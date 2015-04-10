@@ -1,3 +1,5 @@
+var red = "#AC3931";
+var green = "#4FCC54"
 window.onload = function() {
     var message = "";
     document.getElementById("login").onclick = function() {
@@ -10,16 +12,21 @@ window.onload = function() {
     },
     function(response) {
         renderStatus(response.message);
-        document.getElementById("onoff").textContent = response.onoff;
+        renderToggle(response.onoff, response.boolv);
     });
     document.getElementById("onoff").onclick = function() {
         chrome.extension.sendMessage({
             type: "toggle"
         },
-        function(reponse) {
-            document.getElementById("onoff").textContent = reponse.onoff;
+        function(response) {
+            renderToggle(response.onoff, response.boolv);
         });
     }
+}
+
+function renderToggle(onOrOff, boolv) {
+    document.getElementById("onoff").textContent = onOrOff;
+    document.getElementById("onoff").style.background = (boolv) ? green : red;
 }
 
 function renderStatus(message) {

@@ -48,7 +48,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             }
             sendResponse({
                 message: res,
-                onoff: onoff
+                onoff: onoff,
+                boolv: off
             });
             break;
         case "new-access-code":
@@ -68,7 +69,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             }
             var onoff = (off == false) ? "Turn Off Partify Service" : "Turn On Partify Service";
             sendResponse({
-                onoff: onoff
+                onoff: onoff,
+                boolv: off
             })
             break;
         break;
