@@ -13,6 +13,7 @@ var refreshThreshold = 0.90;
 var openedOnce = false;
 var off = false;
 var on = !off;
+var updateIntervalSeconds = 3;
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 function(details) {
@@ -29,7 +30,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             console.log("case id");
             var id = request.value;
             spotifyId = id;
-            getAccessCode(id);
+            getAccessCode(id, true);
             initializeTokens();
             logTokens();
             updateStatus();
@@ -80,9 +81,15 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
 function updateStatus() {
     if (!off) {
-        getStatus();
+        if (!(csrf == "") && !(oauth == "") && !(accessCode == "") && !(playlistId == "")) {
+            getStatus();
+        } else if ((csrf == "") || (oauth == "")) {
+            initializeTokens();
+        } else if ((accessCode == "") || (playlistId == "")) {
+            getAccessCode(spotifyId, false);
+        }
     }
-    setTimeout(function() { updateStatus() }, 1000);
+    setTimeout(function() { updateStatus() }, 1000 * updateIntervalSeconds);
 }
 
 function logTokens() {
@@ -113,6 +120,8 @@ function postTrackToPlaylist() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             console.log(xmlhttp.responseText);
             console.log("new song posted to partify");
+        } else if (xmlhttp.readyState == 4 && xmlhttp.status == 404) {
+            getAccessCode(spotifyId, false);
         }
     }
     xmlhttp.open("POST", url, true);
@@ -144,7 +153,7 @@ function openTabsInitially() {
     chrome.tabs.create({url:"http://partify.club/party/" + accessCode,"active":false});
 }
 
-var getAccessCode = function(id) {
+var getAccessCode = function(id, openTabs) {
     var url = "http://www.partify.club/api/auth?spotifyId=" + id;
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
@@ -154,7 +163,9 @@ var getAccessCode = function(id) {
             var localPlaylistId = jsonResponse["playlistId"];
             playlistId = localPlaylistId;
             accessCode = localAccessCode;
-            openTabsInitially();
+            if (openTabs) {
+                openTabsInitially();
+            }
         }
     }
     xmlhttp.open("GET", url, true);
