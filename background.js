@@ -262,7 +262,10 @@ var getCsrf = function() {
     }
     xmlhttp.onerror = function() {
         port += 1;
-        setTimeout(function() { getCsrf(); }, 100);
+        if (port == 4390) {
+            port = 4370;
+        }
+        setTimeout(function() { getCsrf(); }, 500);
     }
     xmlhttp.open("GET", url, true);
     xmlhttp.send();  
