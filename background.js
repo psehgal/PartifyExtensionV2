@@ -9,10 +9,9 @@ var accessCode = "";
 var playlistId = "";
 var spotifyId = "";
 var refreshed = false;
-var refreshThreshold = 0.90;
+var refreshThreshold = 75;
 var openedOnce = false;
-var off = false;
-var on = !off;
+var off = true;
 var updateIntervalSeconds = 3;
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
@@ -30,10 +29,10 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             console.log("case id");
             var id = request.value;
             spotifyId = id;
-            getAccessCode(id, true);
-            initializeTokens();
-            logTokens();
-            updateStatus();
+            getAccessCode(id, false);
+            //initializeTokens();
+            //logTokens();
+            //updateStatus();
             break;
         case "login":
             console.log("case login");
@@ -42,7 +41,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         case "get-status":
             console.log("case get-status");
             var res = '<span style="opacity:.5;">connect</span>';
-            var onoff = (off == false) ? "Turn Off Partify Service" : "Turn On Partify Service";
+            var onoff = (off == false) ? "Turn Off Partify" : "Turn On Partify";
             console.log("onoff: " + onoff);
             if (!(accessCode == "")) {
                 res = accessCode;
@@ -67,8 +66,14 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
                 off = true;
             } else {
                 off = false;
+                if (!spotifyId) {
+                    login();
+                }
+                initializeTokens();
+                logTokens();
+                updateStatus();
             }
-            var onoff = (off == false) ? "Turn Off Partify Service" : "Turn On Partify Service";
+            var onoff = (off == false) ? "Turn Off Partify" : "Turn On Partify";
             sendResponse({
                 onoff: onoff,
                 boolv: off
@@ -79,13 +84,14 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     return true;
 });
 
+
 function updateStatus() {
     if (!off) {
-        if (!(csrf == "") && !(oauth == "") && !(accessCode == "") && !(playlistId == "")) {
+        if (csrf && oauth && accessCode && playlistId) {
             getStatus();
-        } else if ((csrf == "") || (oauth == "")) {
+        } else if (!csrf || !oauth) {
             initializeTokens();
-        } else if ((accessCode == "") || (playlistId == "")) {
+        } else if (!accessCode) {
             getAccessCode(spotifyId, false);
         }
     }
@@ -212,7 +218,7 @@ var getStatus = function() {
                 var position = jsonResponse["playing_position"]
                 var percent = (position / length) * 100;
                 currentPosition = percent;
-                if (percent >= 75 && refreshed == false) {
+                if (percent >= refreshThreshold && refreshed == false) {
                     console.log("about to call refreshPlaylist()");
                     refreshPlaylist();
                 }
