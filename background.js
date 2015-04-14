@@ -127,7 +127,9 @@ function updateTrackId(jsonResponse) {
         var playingPosition = jsonResponse["playing_position"];
         var length = jsonResponse["track"]["length"];
         postTrackToPlaylist(playingPosition, length);
+        return true;
     }
+    return false;
 }
 
 function updateProperty(propertyString, iProperty) {
@@ -273,7 +275,7 @@ var getStatus = function() {
                 var trackUri = jsonResponse["track"]["track_resource"]["uri"];
                 //var localCurrentTrack = trackUri.replace("spotify:track:", "");
                 var localCurrentTrack = trackUri;
-                updateTrackId(jsonResponse);
+                var updated = updateTrackId(jsonResponse);
                 //console.log(localCurrentTrack);
                 var properties = ["volume", "playing", "shuffle", "repeat"];
                 var length = jsonResponse["track"]["length"];
@@ -285,7 +287,7 @@ var getStatus = function() {
                     updateProperty(propertyString, iProperty);
                 }
                 var skipThreshold = (updateIntervalSeconds / length) * 100.00;
-                if (currentPosition) {
+                if (currentPosition && !updated) {
                     var delta = Math.abs(percent - currentPosition)
                     if (delta > (skipThreshold * skipThresholdMultiplier)) {
                         console.log("skip detected!");
