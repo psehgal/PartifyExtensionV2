@@ -291,7 +291,7 @@ var getStatus = function() {
                 currentPosition = percent;
                 if (percent >= refreshThreshold && refreshed == false) {
                     //console.log("about to call refreshPlaylist()");
-                    //refreshPlaylist();
+                    refreshPlaylist();
                 }
             }
         }
