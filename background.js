@@ -118,12 +118,15 @@ function initializeTokens() {
     getCsrf();
 }
 
-function updateTrackId(trackId) {
+function updateTrackId(jsonResponse) {
+    var trackId = jsonResponse["track"]["track_resource"]["uri"];
     if (currentTrack != trackId) {
         refreshed = false;
         currentTrack = trackId;
         console.log("current track updated: " + currentTrack);
-        postTrackToPlaylist();
+        var playingPosition = jsonResponse["playing_position"];
+        var length = jsonResponse["track"]["length"];
+        postTrackToPlaylist(playingPosition, length);
     }
 }
 
@@ -175,11 +178,11 @@ function postProperty(propertyString, property) {
     xmlhttp.send(params);
 }
 
-function postTrackToPlaylist() {
+function postTrackToPlaylist(playingPosition, length) {
     var xmlhttp = new XMLHttpRequest();
     url = "https://partify.herokuapp.com/api/currentSong";
     // var params = "accessCode=" + accessCode + "&songId=" + '"' + currentTrack + '"';
-    var params = "accessCode=" + accessCode + "&songId=" + currentTrack;
+    var params = "accessCode=" + accessCode + "&songId=" + currentTrack + "&playingPosition=" + playingPosition + "&length=" + length;
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             console.log(xmlhttp.responseText);
@@ -270,7 +273,7 @@ var getStatus = function() {
                 var trackUri = jsonResponse["track"]["track_resource"]["uri"];
                 //var localCurrentTrack = trackUri.replace("spotify:track:", "");
                 var localCurrentTrack = trackUri;
-                updateTrackId(localCurrentTrack);
+                updateTrackId(jsonResponse);
                 //console.log(localCurrentTrack);
                 var properties = ["volume", "playing", "shuffle", "repeat"];
                 var length = jsonResponse["track"]["length"];
@@ -286,6 +289,7 @@ var getStatus = function() {
                     var delta = Math.abs(percent - currentPosition)
                     if (delta > (skipThreshold * skipThresholdMultiplier)) {
                         console.log("skip detected!");
+                        postTrackToPlaylist(position, length);
                     }
                 }
                 currentPosition = percent;
