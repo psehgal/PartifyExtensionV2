@@ -1,9 +1,12 @@
-var keys = document.getElementsByClassName("big-boy-title");
-var values = document.getElementsByClassName("big-boy-value");
-var id = values[0].innerText;
+var id;
 
-document.getElementById("access-code-wanted").onchange = function() {
-	var newIdElement = document.getElementById("access-code-wanted");
+document.onload = function() {
+	id = document.getElementById("access-code").value;
+}
+
+
+document.getElementById("access-code").onchange = function() {
+	var newIdElement = document.getElementById("access-code");
 	var accessCode = newIdElement.value;
 	chrome.extension.sendMessage({
 		type: "new-access-code",

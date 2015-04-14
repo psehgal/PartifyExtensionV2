@@ -34,7 +34,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             console.log("case id");
             var id = request.value;
             spotifyId = id;
-            getAccessCode(id, false);
+            getAccessCode(id, true);
             //initializeTokens();
             //logTokens();
             //updateStatus();
