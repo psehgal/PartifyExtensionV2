@@ -73,9 +73,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
                 off = true;
             } else {
                 off = false;
-                if (!spotifyId) {
-                    login();
-                }
+                login();
                 initializeTokens();
                 logTokens();
                 updateStatus();
