@@ -182,7 +182,7 @@ function postTrackToPlaylist(playingPosition, length) {
     var xmlhttp = new XMLHttpRequest();
     url = "https://partify.herokuapp.com/api/currentSong";
     // var params = "accessCode=" + accessCode + "&songId=" + '"' + currentTrack + '"';
-    var params = "accessCode=" + accessCode + "&songId=" + currentTrack + "&playingPosition=" + playingPosition + "&length=" + length;
+    var params = "accessCode=" + accessCode + "&songId=" + currentTrack + "&playingPosition=" + playingPosition + "&length=" + length + "&timestamp=" + Date.now();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             console.log(xmlhttp.responseText);
