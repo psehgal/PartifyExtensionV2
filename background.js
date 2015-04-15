@@ -48,9 +48,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             var res = '<span style="opacity:.5;">connect</span>';
             if (accessCode) {
                 res = accessCode;
-            } else {
-                off = true;
-            }
+            } 
             var onoff = (off == false) ? "Turn Off Partify" : "Turn On Partify";
             console.log("onoff: " + onoff);
             sendResponse({
@@ -130,36 +128,47 @@ function updateTrackId(jsonResponse) {
     return false;
 }
 
+function updateProperties(propertiesList, jsonResponse) {
+    var propertyChanged = false;
+    for (var i = 0; i < propertiesList.length; i++) {
+        var propertyString = propertiesList[i];
+        var iProperty = jsonResponse[propertyString];
+        propertyChanged = updateProperty(propertyString, iProperty) || propertyChanged;
+    }
+    return propertyChanged;
+}
+
 function updateProperty(propertyString, iProperty) {
-    var post = false;
+    var changed = false;
     if (propertyString == "volume") {
         if (volume != iProperty) {
             volume = iProperty;
             console.log("volume: " + iProperty);
-            post = true;
+            changed = true;
         }
     } else if (propertyString == "shuffle") {
         if (shuffle != iProperty) {
             shuffle = iProperty;
             console.log("shuffle: " + iProperty);
-            post = true;
+            changed = true;
         }
     } else if (propertyString == "playing") {
         if (playing != iProperty) {
             playing = iProperty;
             console.log("playing: " + iProperty);
-            post = true;
+            changed = true;
         }
     } else if (propertyString == "repeat") {
         if (repeat != iProperty) {
             repeat = iProperty;
             console.log("repeat: " + iProperty);
-            post = true;
+            changed = true;
         }
     }
-    if (post) {
-        postProperty(propertyString, iProperty);
-    }
+    // if (changed) {
+    //     postProperty(propertyString, iProperty);
+    // }
+    return changed;
 }
  
 function postProperty(propertyString, property) {
@@ -182,7 +191,7 @@ function postTrackToPlaylist(playingPosition, length) {
     var xmlhttp = new XMLHttpRequest();
     url = "https://partify.herokuapp.com/api/currentSong";
     // var params = "accessCode=" + accessCode + "&songId=" + '"' + currentTrack + '"';
-    var params = "accessCode=" + accessCode + "&songId=" + currentTrack + "&playingPosition=" + playingPosition + "&length=" + length + "&timestamp=" + Date.now();
+    var params = "accessCode=" + accessCode + "&songId=" + currentTrack + "&playingPosition=" + playingPosition + "&length=" + length + "&timestamp=" + Date.now() + "&playing=" + playing + "&repeat=" + repeat + "&shuffle=" + shuffle + "&volume=" + volume;
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             console.log(xmlhttp.responseText);
@@ -280,18 +289,26 @@ var getStatus = function() {
                 var length = jsonResponse["track"]["length"];
                 var position = jsonResponse["playing_position"];
                 var percent = (position / length) * 100;
-                for (var i = 0; i < properties.length; i++) {
-                    var propertyString = properties[i];
-                    var iProperty = jsonResponse[propertyString];
-                    updateProperty(propertyString, iProperty);
-                }
+                // for (var i = 0; i < properties.length; i++) {
+                //     var propertyString = properties[i];
+                //     var iProperty = jsonResponse[propertyString];
+                //     updateProperty(propertyString, iProperty);
+                // }
+                var skipDetected = false;
+                var changed = updateProperties(properties, jsonResponse);
                 var skipThreshold = (updateIntervalSeconds / length) * 100.00;
-                if (currentPosition && !updated) {
+                if (currentPosition) {
                     var delta = Math.abs(percent - currentPosition)
                     if (delta > (skipThreshold * skipThresholdMultiplier)) {
                         console.log("skip detected!");
-                        postTrackToPlaylist(position, length);
+                        skipDetected = true;
+                        //postTrackToPlaylist(position, length);
                     }
+                }
+                if (!updated && (changed || skipDetected)) {
+                    //post to /api/currentSong
+                    console.log("change detected");
+                    postTrackToPlaylist(position, length);
                 }
                 currentPosition = percent;
                 if (percent >= refreshThreshold && refreshed == false) {
