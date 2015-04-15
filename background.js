@@ -91,7 +91,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 function updateStatus() {
-    if (accessCode === undefined) {
+    if (accessCode == undefined) {
         off = true;
     }
     if (!off) {
@@ -230,6 +230,7 @@ var getAccessCode = function(id, openTabs) {
             var localPlaylistId = jsonResponse["playlistId"];
             playlistId = localPlaylistId;
             accessCode = localAccessCode;
+            console.log("getAccessCode() got accessCode: " + accessCode);
             if (openTabs) {
                 openTabsInitially();
             }

@@ -1,8 +1,5 @@
-var id;
 
-document.onload = function() {
-	id = document.getElementById("access-code").value;
-}
+var id = document.getElementById("spotifyId").innerText;
 
 
 document.getElementById("access-code").onchange = function() {
@@ -13,8 +10,8 @@ document.getElementById("access-code").onchange = function() {
 		value: accessCode
 	})
 }
-
+console.log(id);
 chrome.extension.sendMessage({
 	type: "id",
 	value: id
-})
+});
