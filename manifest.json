@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "partify",
-  "version": "0.0.1",
+  "name": "PARTIFY",
+  "version": "0.9.0",
   "icons": { "16": "icons/partify_icon.png", "48": "icons/partify_icon.png", "128": "icons/partify_icon.png" },
 
   "permissions":[
