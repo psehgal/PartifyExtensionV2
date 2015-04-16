@@ -11,6 +11,7 @@ window.onload = function() {
         type: "get-status"
     },
     function(response) {
+        renderError(response.error);
         renderStatus(response.message);
         renderToggle(response.onoff, response.boolv);
     });
@@ -27,6 +28,10 @@ window.onload = function() {
 function renderToggle(onOrOff, boolv) {
     document.getElementById("onoff").textContent = onOrOff;
     document.getElementById("onoff").style.background = (boolv) ? green : red;
+}
+
+function renderError(message) {
+    document.getElementById("error").innerText = message;
 }
 
 function renderStatus(message) {

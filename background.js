@@ -6,6 +6,7 @@ var currentPosition;
 var accessCode = "";
 var playlistId = "";
 var spotifyId = "";
+var errorMessage = "";
 var refreshed = false;
 var refreshThreshold = 75;
 var openedOnce = false;
@@ -18,6 +19,9 @@ var playing = false;
 var repeat = false;
 var installed = false;
 var skipThresholdMultiplier = 1.05;
+var maxPartTimeHours = 4;
+var maxPartyTimeSeconds = maxPartTimeHours * 60 * 60;
+var timeRunningSeconds = 0;
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 function(details) {
@@ -54,13 +58,14 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             sendResponse({
                 message: res,
                 onoff: onoff,
-                boolv: off
+                boolv: off,
+                error: errorMessage
             });
             if (!accessCode) {
                 if (spotifyId)
                     getAccessCode(spotifyId, false);
             }
-            initializeTokens();
+            //initializeTokens();
             break;
         case "new-access-code":
             console.log("case new-access-code");
@@ -77,7 +82,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             } else {
                 off = false;
                 login();
-                initializeTokens();
+                //initializeTokens();
+                timeRunningSeconds = 0;
+                errorMessage = "";
                 logTokens();
                 //updateStatus();
                 if (!installed) {
@@ -98,19 +105,38 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 function updateStatus() {
-    if (spotifyId == undefined) {
-        login();
-    }
+    var timedOut = false;
     if (!off) {
-        if (csrf && oauth && accessCode && playlistId) {
-            getStatus();
-        } else if (!csrf || !oauth) {
-            initializeTokens();
-        } else if (!accessCode) {
-            getAccessCode(spotifyId, false);
+        timeRunningSeconds = timeRunningSeconds + updateIntervalSeconds;
+        if (timeRunningSeconds > maxPartyTimeSeconds) {
+            off = true;
+            alert("Your party timed out. Turn on Partify to start it again.");
+            errorMessage = "party timed out";
+            timedOut = true;
+        }
+        if (navigator.onLine) {
+            if (!timedOut) {
+                if (spotifyId == undefined) {
+                    login();
+                }
+                console.log("online");
+                errorMessage = "" ;
+                if (csrf && oauth && accessCode && playlistId) {
+                    getStatus();
+                } else if (!csrf || !oauth) {
+                    initializeTokens();
+                } else if (!accessCode) {
+                    getAccessCode(spotifyId, false);
+                }
+            }
+        } else {
+            console.log("offline");
+            errorMessage = "internet connection lost"
+            off = true;
         }
     }
     setTimeout(function() { updateStatus() }, 1000 * updateIntervalSeconds);
+
 }
 
 function logTokens() {
