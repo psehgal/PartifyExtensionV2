@@ -11,11 +11,13 @@ var refreshThreshold = 75;
 var openedOnce = false;
 var off = true;
 var updateIntervalSeconds = 3;
+var updateStatusInitialDelaySeconds = 10;
 var volume = 0;
 var shuffle = false;
 var playing = false;
 var repeat = false;
-var skipThresholdMultiplier = 1.25;
+var installed = false;
+var skipThresholdMultiplier = 1.05;
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 function(details) {
@@ -54,6 +56,11 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
                 onoff: onoff,
                 boolv: off
             });
+            if (!accessCode) {
+                if (spotifyId)
+                    getAccessCode(spotifyId, false);
+            }
+            initializeTokens();
             break;
         case "new-access-code":
             console.log("case new-access-code");
@@ -72,7 +79,11 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
                 login();
                 initializeTokens();
                 logTokens();
-                updateStatus();
+                //updateStatus();
+                if (!installed) {
+                    installed = true;
+                    setTimeout(function() { updateStatus(); }, 1000 * updateStatusInitialDelaySeconds);
+                }
             }
             var onoff = (off == false) ? "Turn Off Partify" : "Turn On Partify";
             sendResponse({
@@ -87,8 +98,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 function updateStatus() {
-    if (accessCode == undefined) {
-        off = true;
+    if (spotifyId == undefined) {
+        login();
     }
     if (!off) {
         if (csrf && oauth && accessCode && playlistId) {
