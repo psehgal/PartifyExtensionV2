@@ -22,6 +22,8 @@ var skipThresholdMultiplier = 1.05;
 var maxPartTimeHours = 4;
 var maxPartyTimeSeconds = maxPartTimeHours * 60 * 60;
 var timeRunningSeconds = 0;
+var playingPositionGlobal = 0;
+var lengthGlobal = 0;
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 function(details) {
@@ -68,6 +70,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         case "toggle":
             if (off == false) {
                 off = true;
+                postTrackToPlaylist(playingPositionGlobal, lengthGlobal, true);
             } else {
                 off = false;
                 login();
@@ -96,6 +99,7 @@ function updateStatus() {
         timeRunningSeconds = timeRunningSeconds + updateIntervalSeconds;
         if (timeRunningSeconds > maxPartyTimeSeconds) {
             off = true;
+            postTrackToPlaylist(playingPositionGlobal, lengthGlobal, true);
             alert("Your party timed out. Turn on Partify to start it again.");
             errorMessage = "party timed out";
             timedOut = true;
@@ -140,7 +144,7 @@ function updateTrackId(jsonResponse) {
         currentTrack = trackId;
         var playingPosition = jsonResponse["playing_position"];
         var length = jsonResponse["track"]["length"];
-        postTrackToPlaylist(playingPosition, length);
+        postTrackToPlaylist(playingPosition, length, false);
         return true;
     }
     return false;
@@ -197,9 +201,12 @@ function postProperty(propertyString, property) {
     xmlhttp.send(params);
 }
 
-function postTrackToPlaylist(playingPosition, length) {
+function postTrackToPlaylist(playingPosition, length, turningOff) {
     var xmlhttp = new XMLHttpRequest();
     url = "https://partify.herokuapp.com/api/currentSong";
+    if (turningOff) {
+        playing = false;
+    }
     var params = "accessCode=" + accessCode + "&songId=" + currentTrack + "&playingPosition=" + playingPosition + "&length=" + length + "&timestamp=" + Date.now() + "&playing=" + playing + "&repeat=" + repeat + "&shuffle=" + shuffle + "&volume=" + volume;
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -289,6 +296,8 @@ var getStatus = function() {
                 var properties = ["volume", "playing", "shuffle", "repeat"];
                 var length = jsonResponse["track"]["length"];
                 var position = jsonResponse["playing_position"];
+                playingPositionGlobal = position;
+                lengthGlobal = length;
                 var percent = (position / length) * 100;
                 var skipDetected = false;
                 var changed = updateProperties(properties, jsonResponse);
@@ -300,7 +309,7 @@ var getStatus = function() {
                     }
                 }
                 if (!updated && (changed || skipDetected)) {
-                    postTrackToPlaylist(position, length);
+                    postTrackToPlaylist(position, length, false);
                 }
                 currentPosition = percent;
                 if (percent >= refreshThreshold && refreshed == false) {
