@@ -21,14 +21,14 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
 var createPlaylistWithLogin = function() {
 	playlistId = makeid();
-	var url = "http://partify.herokuapp.com/login/";
+	var url = "http://partify.club/login/";
 	var http = new XMLHttpRequest();
 	var fullUrl = url + playlistId;
 	chrome.tabs.create( {url : fullUrl} );
 }
 
 var login = function() {
-	chrome.tabs.create({ url : "http://partify.herokuapp.com/login"});
+	chrome.tabs.create({ url : "http://partify.club/login"});
 }
 
 function getSpotifyTab() {

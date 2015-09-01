@@ -32,7 +32,7 @@ function(details) {
 },
 {urls: ["*://*.spotilocal.com:*/*"]},
 ["blocking", "requestHeaders"]);
-      
+
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     switch(request.type) {
@@ -48,7 +48,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             var res = '<span style="opacity:.5;">connect</span>';
             if (accessCode) {
                 res = accessCode;
-            } 
+            }
             var onoff = (off == false) ? "Turn Off Partify" : "Turn On Partify";
             sendResponse({
                 message: res,
@@ -185,10 +185,10 @@ function updateProperty(propertyString, iProperty) {
     }
     return changed;
 }
- 
+
 function postProperty(propertyString, property) {
     var xmlhttp = new XMLHttpRequest();
-    var url = "https://partify.herokuapp.com/api/status"
+    var url = "http://partify.club/api/status"
     var params = propertyString + "=" + property.toString() + "&accessCode=" + accessCode;
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -203,7 +203,7 @@ function postProperty(propertyString, property) {
 
 function postTrackToPlaylist(playingPosition, length, turningOff) {
     var xmlhttp = new XMLHttpRequest();
-    url = "https://partify.herokuapp.com/api/currentSong";
+    url = "http://partify.club/api/currentSong";
     if (turningOff) {
         playing = false;
     }
@@ -356,6 +356,5 @@ var getCsrf = function() {
         setTimeout(function() { getCsrf(); }, 500);
     }
     xmlhttp.open("GET", url, true);
-    xmlhttp.send();  
+    xmlhttp.send();
 }
-
